@@ -1,18 +1,30 @@
-import 'dart:collection';
 import "dart:io";
 
+import "Account.dart";
+
 class Owner {
-  final int id;
+  int _id;
   String _name;
   String _CPF;
   String _number;
   String _email;
+
+  Account account;
   
   // Lista de armazenamento de todos os titulares cadastrados no sistema
   List<Owner> _ownersList = List.empty(growable: true);
 
   // Construtor 
-  Owner(this.id, this._name, this._CPF, this._number, this._email) {
+  Owner(this._id, this._name, this._CPF, this._number, this._email) {
+  }
+
+  //Get e Set ID
+  int get id {
+    return this._id;
+  }
+
+  void set id(int newId) {
+    this._id = newId;
   }
 
   // Get e Set name
@@ -62,42 +74,33 @@ class Owner {
     }
   }
   
-  void registerNewOwner() {
-    var ownersList = getOwnersList();
-
-    // Solicitação de informações para cadastro de um novo titular no sistema
-    print("Por favor, insira as informações solicitadas, sobre o titular");
-
-    stdout.write("Nome: ");
-    String name = stdin.readLineSync()!;
-
-    stdout.write("CPF: ");
-    String CPF = stdin.readLineSync()!;
-
-    stdout.write("Número para contato: ");
-    String number = stdin.readLineSync()!;
-
-    stdout.write("Email: ");
-    String email = stdin.readLineSync()!;
-
+  bool registerNewOwner(Owner newOwner) {
     // ID incremental para evitar repetição
-    int id = ownersList.length++;
+    int incrementalId = _ownersList.length++;
 
-    for(Owner owner in ownersList) {
-      if(owner.CPF == CPF) {
-        print("Erro ao cadastrar novo titular: CPF fornecido já está em uso");
-        return;
-      }
-      else {
-        Owner newOwner = Owner(id, name, CPF, number, email);
-        ownersList.add(newOwner);
+    newOwner.id = incrementalId;
+
+    for(Owner owner in _ownersList) {
+      if(owner.CPF == newOwner.CPF) {
+        return false;
       }
     }
+
+    _ownersList.add(newOwner);
+    return true; 
   }
 
   // Método para retorno de todos os titulares cadastrados no sistema
   List<Owner> getOwnersList() {
     return this._ownersList;
+  }
+
+  Owner getOwner(clientCPF) {
+    for(Owner owner in _ownersList) {
+      if(owner._CPF == clientCPF) {
+        return owner;
+      }
+    }
   }
 
   @override
